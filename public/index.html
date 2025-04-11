@@ -2,6 +2,34 @@
 <html>
 <head>
   <title>Voice Chat</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      margin-top: 50px;
+    }
+    input, button {
+      padding: 10px;
+      font-size: 16px;
+      margin: 5px;
+    }
+    #speakerIndicator {
+      margin-top: 20px;
+      width: 20px;
+      height: 20px;
+      background-color: gray;
+      border-radius: 50%;
+      display: inline-block;
+    }
+    #controls {
+      margin-top: 15px;
+      display: none;
+    }
+    #status {
+      margin-top: 10px;
+      font-weight: bold;
+    }
+  </style>
 </head>
 <body>
   <h2>Voice Chat</h2>
@@ -11,6 +39,10 @@
     <button id="joinBtn">Join Room</button>
   </div>
   <p id="status"></p>
+  <div id="controls">
+    <button id="muteBtn">Mute</button>
+    <p>Speaker: <span id="speakerIndicator"></span></p>
+  </div>
   <script src="/socket.io/socket.io.js"></script>
   <script src="script.js"></script>
 </body>
