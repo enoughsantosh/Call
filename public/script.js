@@ -1,4 +1,5 @@
-const socket = io(); // Connect to server
+const socket = io('https://call-w9t9.onrender.com');
+// Connect to server
 let localStream;
 let peerConn;
 let room = null;
