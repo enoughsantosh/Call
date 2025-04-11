@@ -1,178 +1,747 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <title>Voice Chat</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Enhanced Voice Chat</title>
   <style>
+    :root {
+      --primary-color: #4a6fa5;
+      --secondary-color: #166088;
+      --success-color: #28a745;
+      --warning-color: #ffc107;
+      --danger-color: #dc3545;
+      --light-color: #f8f9fa;
+      --dark-color: #343a40;
+    }
+    
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    
     body {
-      font-family: Arial, sans-serif;
-      text-align: center;
-      margin-top: 50px;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      line-height: 1.6;
+      color: var(--dark-color);
+      background-color: #f5f7fa;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-height: 100vh;
+      padding: 20px;
     }
-    input, button {
-      padding: 10px;
-      font-size: 16px;
-      margin: 5px;
-    }
-    #speakerIndicator {
+    
+    .container {
+      width: 100%;
+      max-width: 600px;
+      background-color: white;
+      border-radius: 10px;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+      padding: 30px;
       margin-top: 20px;
-      width: 20px;
-      height: 20px;
-      background-color: gray;
-      border-radius: 50%;
-      display: inline-block;
     }
-    #controls {
-      margin-top: 15px;
+    
+    header {
+      text-align: center;
+      margin-bottom: 25px;
+    }
+    
+    h1 {
+      color: var(--primary-color);
+      font-size: 2rem;
+      margin-bottom: 10px;
+    }
+    
+    .subtitle {
+      color: var(--secondary-color);
+      font-size: 1rem;
+    }
+    
+    .room-controls {
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+      margin-bottom: 20px;
+    }
+    
+    .input-group {
+      display: flex;
+      gap: 10px;
+    }
+    
+    input {
+      flex: 1;
+      padding: 12px;
+      border: 1px solid #ddd;
+      border-radius: 5px;
+      font-size: 1rem;
+    }
+    
+    button {
+      padding: 12px 20px;
+      background-color: var(--primary-color);
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 1rem;
+      transition: background-color 0.2s;
+    }
+    
+    button:hover {
+      background-color: var(--secondary-color);
+    }
+    
+    button:disabled {
+      background-color: #cccccc;
+      cursor: not-allowed;
+    }
+    
+    .btn-success {
+      background-color: var(--success-color);
+    }
+    
+    .btn-success:hover {
+      background-color: #218838;
+    }
+    
+    .btn-danger {
+      background-color: var(--danger-color);
+    }
+    
+    .btn-danger:hover {
+      background-color: #c82333;
+    }
+    
+    #status {
+      padding: 15px;
+      border-radius: 5px;
+      margin: 15px 0;
+      text-align: center;
+      font-weight: 500;
       display: none;
     }
-    #status {
-      margin-top: 10px;
+    
+    .status-success {
+      background-color: rgba(40, 167, 69, 0.1);
+      color: var(--success-color);
+      display: block !important;
+    }
+    
+    .status-warning {
+      background-color: rgba(255, 193, 7, 0.1);
+      color: #856404;
+      display: block !important;
+    }
+    
+    .status-error {
+      background-color: rgba(220, 53, 69, 0.1);
+      color: var(--danger-color);
+      display: block !important;
+    }
+    
+    .connection-info {
+      background-color: #e9ecef;
+      padding: 15px;
+      border-radius: 5px;
+      margin-bottom: 20px;
+      display: none;
+    }
+    
+    .room-info {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 10px;
+    }
+    
+    .room-code {
       font-weight: bold;
+      font-family: monospace;
+      font-size: 1.2rem;
+    }
+    
+    .copy-btn {
+      background: none;
+      color: var(--primary-color);
+      padding: 5px 10px;
+      font-size: 0.9rem;
+    }
+    
+    .copy-btn:hover {
+      background-color: rgba(74, 111, 165, 0.1);
+    }
+    
+    .audio-controls {
+      margin-top: 20px;
+      display: none;
+    }
+    
+    .control-group {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 15px;
+    }
+    
+    .volume-control {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    
+    .volume-slider {
+      width: 100px;
+    }
+    
+    .voice-indicator {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    
+    .indicator {
+      width: 15px;
+      height: 15px;
+      border-radius: 50%;
+      background-color: #ccc;
+      transition: background-color 0.2s;
+    }
+    
+    .active {
+      background-color: var(--success-color);
+    }
+    
+    .connection-status {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 15px;
+    }
+    
+    .status-item {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      font-size: 0.9rem;
+    }
+    
+    .status-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background-color: #ccc;
+    }
+    
+    .status-dot.connected {
+      background-color: var(--success-color);
+    }
+    
+    .status-dot.disconnected {
+      background-color: var(--danger-color);
+    }
+    
+    .status-dot.connecting {
+      background-color: var(--warning-color);
+      animation: blink 1s infinite;
+    }
+    
+    @keyframes blink {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.5; }
+    }
+    
+    footer {
+      margin-top: 30px;
+      text-align: center;
+      font-size: 0.9rem;
+      color: #6c757d;
+    }
+    
+    @media (max-width: 600px) {
+      .container {
+        padding: 20px;
+      }
+      
+      h1 {
+        font-size: 1.5rem;
+      }
+      
+      .input-group {
+        flex-direction: column;
+      }
+      
+      button {
+        width: 100%;
+      }
     }
   </style>
 </head>
 <body>
-  <h2>Voice Chat</h2>
-  <div>
-    <button id="createBtn">Create Room</button>
-    <input type="text" id="roomCode" placeholder="Enter Room Code" />
-    <button id="joinBtn">Join Room</button>
+  <div class="container">
+    <header>
+      <h1>Enhanced Voice Chat</h1>
+      <p class="subtitle">Simple, secure, real-time voice communication</p>
+    </header>
+    
+    <div class="room-controls">
+      <div class="input-group">
+        <button id="createBtn">Create Room</button>
+        <button id="leaveBtn" disabled>Leave Room</button>
+      </div>
+      <div class="input-group">
+        <input type="text" id="roomCode" placeholder="Enter Room Code" />
+        <button id="joinBtn">Join Room</button>
+      </div>
+    </div>
+    
+    <div id="status"></div>
+    
+    <div id="connectionInfo" class="connection-info">
+      <div class="room-info">
+        <div>Room Code: <span id="currentRoom" class="room-code"></span></div>
+        <button id="copyBtn" class="copy-btn">Copy</button>
+      </div>
+      <div class="connection-status">
+        <div class="status-item">
+          <span class="status-dot" id="localStatus"></span>
+          <span>You</span>
+        </div>
+        <div class="status-item">
+          <span class="status-dot" id="remoteStatus"></span>
+          <span>Peer</span>
+        </div>
+      </div>
+    </div>
+    
+    <div id="audioControls" class="audio-controls">
+      <div class="control-group">
+        <button id="muteBtn">Mute Microphone</button>
+        <div class="voice-indicator">
+          <span>Your Voice:</span>
+          <div id="localIndicator" class="indicator"></div>
+        </div>
+      </div>
+      <div class="control-group">
+        <div class="volume-control">
+          <span>Volume:</span>
+          <input type="range" id="volumeSlider" class="volume-slider" min="0" max="1" step="0.1" value="1">
+        </div>
+        <div class="voice-indicator">
+          <span>Peer Voice:</span>
+          <div id="remoteIndicator" class="indicator"></div>
+        </div>
+      </div>
+    </div>
   </div>
-  <p id="status"></p>
-  <div id="controls">
-    <button id="muteBtn">Mute</button>
-    <p>Speaker: <span id="speakerIndicator"></span></p>
-  </div>
+  
+  <footer>
+    <p>&copy; 2025 Enhanced Voice Chat</p>
+  </footer>
+
   <script src="/socket.io/socket.io.js"></script>
-<script>
-const socket = io(); // auto connects to same domain
-let localStream, peerConn, room = null, isCaller = false;
-const config = {
-  iceServers: [{ urls: 'stun:stun.l.google.com:19302' }]
-};
-
-const createBtn = document.getElementById('createBtn');
-const joinBtn = document.getElementById('joinBtn');
-const roomInput = document.getElementById('roomCode');
-const status = document.getElementById('status');
-const controls = document.getElementById('controls');
-const muteBtn = document.getElementById('muteBtn');
-const speakerIndicator = document.getElementById('speakerIndicator');
-let isMuted = false, remoteAnalyser;
-
-// Room creation
-createBtn.onclick = () => {
-  room = Math.random().toString(36).substring(2, 8);
-  socket.emit('create', room);
-};
-
-joinBtn.onclick = () => {
-  room = roomInput.value.trim();
-  if (!room) return alert("Enter a room code.");
-  socket.emit('join', room);
-};
-
-socket.on('created', r => {
-  isCaller = true;
-  room = r;
-  status.textContent = `Room created: ${room}`;
-});
-
-socket.on('joined', r => {
-  room = r;
-  status.textContent = `Joined room: ${room}`;
-});
-
-socket.on('full', r => {
-  alert("Room is full. Please try a different one.");
-});
-
-socket.on('ready', () => {
-  if (isCaller) startCall(true);
-});
-
-// Main WebRTC logic
-async function startCall(shouldMakeOffer) {
-  try {
-    localStream = await navigator.mediaDevices.getUserMedia({ audio: true });
-
-    peerConn = new RTCPeerConnection(config);
-    localStream.getTracks().forEach(track => peerConn.addTrack(track, localStream));
-
-    peerConn.onicecandidate = e => {
-      if (e.candidate) {
-        socket.emit('ice', { room, candidate: e.candidate });
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      // DOM Elements
+      const createBtn = document.getElementById('createBtn');
+      const joinBtn = document.getElementById('joinBtn');
+      const leaveBtn = document.getElementById('leaveBtn');
+      const roomInput = document.getElementById('roomCode');
+      const status = document.getElementById('status');
+      const connectionInfo = document.getElementById('connectionInfo');
+      const currentRoom = document.getElementById('currentRoom');
+      const copyBtn = document.getElementById('copyBtn');
+      const audioControls = document.getElementById('audioControls');
+      const muteBtn = document.getElementById('muteBtn');
+      const volumeSlider = document.getElementById('volumeSlider');
+      const localIndicator = document.getElementById('localIndicator');
+      const remoteIndicator = document.getElementById('remoteIndicator');
+      const localStatus = document.getElementById('localStatus');
+      const remoteStatus = document.getElementById('remoteStatus');
+      
+      // WebRTC Configuration
+      const config = {
+        iceServers: [
+          { urls: 'stun:stun.l.google.com:19302' },
+          { urls: 'stun:stun1.l.google.com:19302' }
+        ]
+      };
+      
+      // State Variables
+      let socket = null;
+      let localStream = null;
+      let peerConnection = null;
+      let remoteAudio = null;
+      let room = null;
+      let isCaller = false;
+      let isConnected = false;
+      let isMuted = false;
+      let localAnalyser = null;
+      let remoteAnalyser = null;
+      let audioContext = null;
+      
+      // Initialize Socket Connection
+      function initializeSocket() {
+        socket = io();
+        
+        // Socket Event Handlers
+        socket.on('connect', () => {
+          updateStatus('Connected to server', 'success');
+          localStatus.classList.add('connected');
+        });
+        
+        socket.on('disconnect', () => {
+          updateStatus('Disconnected from server', 'error');
+          localStatus.classList.remove('connected');
+          localStatus.classList.add('disconnected');
+        });
+        
+        socket.on('created', handleRoomCreated);
+        socket.on('joined', handleRoomJoined);
+        socket.on('full', handleRoomFull);
+        socket.on('ready', handlePeerReady);
+        socket.on('offer', handleOffer);
+        socket.on('answer', handleAnswer);
+        socket.on('ice', handleIceCandidate);
+        socket.on('leave', handlePeerLeave);
+        socket.on('error', handleError);
       }
-    };
-
-    peerConn.ontrack = event => {
-      const [remoteStream] = event.streams;
-      const audio = new Audio();
-      audio.srcObject = remoteStream;
-      audio.autoplay = true;
-      setupVoiceActivity(remoteStream);
-    };
-
-    if (shouldMakeOffer) {
-      const offer = await peerConn.createOffer();
-      await peerConn.setLocalDescription(offer);
-      socket.emit('offer', { room, offer });
-    }
-
-    controls.style.display = 'block';
-  } catch (err) {
-    console.error("Failed to start call:", err);
-    alert("Could not access your microphone.");
-  }
-}
-
-socket.on('offer', async ({ offer }) => {
-  try {
-    await startCall(false);
-    await peerConn.setRemoteDescription(new RTCSessionDescription(offer));
-    const answer = await peerConn.createAnswer();
-    await peerConn.setLocalDescription(answer);
-    socket.emit('answer', { room, answer });
-  } catch (err) {
-    console.error("Error handling offer:", err);
-  }
-});
-
-socket.on('answer', ({ answer }) => {
-  peerConn.setRemoteDescription(new RTCSessionDescription(answer));
-});
-
-socket.on('ice', ({ candidate }) => {
-  peerConn.addIceCandidate(new RTCIceCandidate(candidate));
-});
-
-muteBtn.onclick = () => {
-  isMuted = !isMuted;
-  if (localStream) {
-    localStream.getAudioTracks()[0].enabled = !isMuted;
-    muteBtn.textContent = isMuted ? 'Unmute' : 'Mute';
-  }
-};
-
-// Voice Activity Detection
-function setupVoiceActivity(stream) {
-  const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-  const source = audioCtx.createMediaStreamSource(stream);
-  remoteAnalyser = audioCtx.createAnalyser();
-  source.connect(remoteAnalyser);
-  remoteAnalyser.fftSize = 512;
-
-  const data = new Uint8Array(remoteAnalyser.frequencyBinCount);
-
-  const checkVolume = () => {
-    remoteAnalyser.getByteFrequencyData(data);
-    const avg = data.reduce((a, b) => a + b) / data.length;
-    speakerIndicator.style.backgroundColor = avg > 10 ? 'green' : 'gray';
-    requestAnimationFrame(checkVolume);
-  };
-
-  checkVolume();
-}
-</script>
+      
+      // Room Event Handlers
+      function handleRoomCreated(roomId) {
+        room = roomId;
+        isCaller = true;
+        updateRoomUI(true);
+        updateStatus(`Room created with code: ${room}`, 'success');
+      }
+      
+      function handleRoomJoined(roomId) {
+        room = roomId;
+        isCaller = false;
+        updateRoomUI(true);
+        updateStatus('Joined room, connecting...', 'warning');
+        socket.emit('ready', room);
+      }
+      
+      function handleRoomFull() {
+        updateStatus('Room is full. Please try a different code.', 'error');
+      }
+      
+      function handlePeerReady() {
+        if (isCaller) {
+          remoteStatus.classList.add('connecting');
+          startCall(true);
+        }
+      }
+      
+      function handlePeerLeave() {
+        updateStatus('Peer has left the room', 'warning');
+        cleanupPeerConnection();
+        remoteStatus.classList.remove('connected', 'connecting');
+        remoteStatus.classList.add('disconnected');
+      }
+      
+      function handleError(error) {
+        updateStatus(`Error: ${error}`, 'error');
+      }
+      
+      // WebRTC Handlers
+      async function startCall(shouldMakeOffer) {
+        try {
+          // Get user media
+          localStream = await navigator.mediaDevices.getUserMedia({ 
+            audio: { 
+              echoCancellation: true,
+              noiseSuppression: true,
+              autoGainControl: true
+            } 
+          });
+          
+          // Create peer connection
+          peerConnection = new RTCPeerConnection(config);
+          
+          // Add local tracks to peer connection
+          localStream.getTracks().forEach(track => {
+            peerConnection.addTrack(track, localStream);
+          });
+          
+          // Set up event handlers
+          peerConnection.onicecandidate = handleLocalIceCandidate;
+          peerConnection.ontrack = handleRemoteTrack;
+          peerConnection.oniceconnectionstatechange = handleConnectionStateChange;
+          
+          // Set up audio analysis
+          setupAudioAnalysis();
+          
+          // Create and send offer if initiator
+          if (shouldMakeOffer) {
+            const offer = await peerConnection.createOffer();
+            await peerConnection.setLocalDescription(offer);
+            socket.emit('offer', { room, offer });
+          }
+          
+          // Show audio controls
+          audioControls.style.display = 'block';
+          
+        } catch (error) {
+          console.error('Error starting call:', error);
+          updateStatus('Could not access your microphone. Please check permissions.', 'error');
+        }
+      }
+      
+      async function handleOffer({ offer }) {
+        try {
+          remoteStatus.classList.add('connecting');
+          await startCall(false);
+          await peerConnection.setRemoteDescription(new RTCSessionDescription(offer));
+          const answer = await peerConnection.createAnswer();
+          await peerConnection.setLocalDescription(answer);
+          socket.emit('answer', { room, answer });
+        } catch (error) {
+          console.error('Error handling offer:', error);
+          updateStatus('Failed to process connection offer', 'error');
+        }
+      }
+      
+      function handleAnswer({ answer }) {
+        peerConnection.setRemoteDescription(new RTCSessionDescription(answer))
+          .catch(error => {
+            console.error('Error setting remote description:', error);
+          });
+      }
+      
+      function handleLocalIceCandidate(event) {
+        if (event.candidate) {
+          socket.emit('ice', { room, candidate: event.candidate });
+        }
+      }
+      
+      function handleIceCandidate({ candidate }) {
+        if (peerConnection) {
+          peerConnection.addIceCandidate(new RTCIceCandidate(candidate))
+            .catch(error => {
+              console.error('Error adding ICE candidate:', error);
+            });
+        }
+      }
+      
+      function handleRemoteTrack(event) {
+        remoteAudio = new Audio();
+        remoteAudio.srcObject = event.streams[0];
+        remoteAudio.autoplay = true;
+        
+        // Update volume from slider
+        remoteAudio.volume = volumeSlider.value;
+        
+        // Set up voice activity detection for remote stream
+        setupRemoteVoiceActivity(event.streams[0]);
+        
+        // Update UI
+        isConnected = true;
+        remoteStatus.classList.remove('connecting');
+        remoteStatus.classList.add('connected');
+        updateStatus('Connected! You can now speak with your peer.', 'success');
+      }
+      
+      function handleConnectionStateChange() {
+        if (!peerConnection) return;
+        
+        const state = peerConnection.iceConnectionState;
+        console.log('ICE connection state:', state);
+        
+        switch(state) {
+          case 'connected':
+          case 'completed':
+            isConnected = true;
+            remoteStatus.classList.remove('connecting');
+            remoteStatus.classList.add('connected');
+            break;
+          case 'disconnected':
+          case 'failed':
+          case 'closed':
+            isConnected = false;
+            remoteStatus.classList.remove('connected', 'connecting');
+            remoteStatus.classList.add('disconnected');
+            break;
+        }
+      }
+      
+      // Audio Analysis Setup
+      function setupAudioAnalysis() {
+        if (!audioContext) {
+          audioContext = new (window.AudioContext || window.webkitAudioContext)();
+        }
+        
+        // Local audio analysis
+        const localSource = audioContext.createMediaStreamSource(localStream);
+        localAnalyser = audioContext.createAnalyser();
+        localAnalyser.fftSize = 256;
+        localSource.connect(localAnalyser);
+        
+        const localData = new Uint8Array(localAnalyser.frequencyBinCount);
+        
+        function checkLocalVolume() {
+          if (!localAnalyser) return;
+          
+          localAnalyser.getByteFrequencyData(localData);
+          const average = localData.reduce((sum, value) => sum + value, 0) / localData.length;
+          
+          if (average > 15) {
+            localIndicator.classList.add('active');
+          } else {
+            localIndicator.classList.remove('active');
+          }
+          
+          requestAnimationFrame(checkLocalVolume);
+        }
+        
+        checkLocalVolume();
+      }
+      
+      function setupRemoteVoiceActivity(stream) {
+        const remoteSource = audioContext.createMediaStreamSource(stream);
+        remoteAnalyser = audioContext.createAnalyser();
+        remoteAnalyser.fftSize = 256;
+        remoteSource.connect(remoteAnalyser);
+        
+        const remoteData = new Uint8Array(remoteAnalyser.frequencyBinCount);
+        
+        function checkRemoteVolume() {
+          if (!remoteAnalyser) return;
+          
+          remoteAnalyser.getByteFrequencyData(remoteData);
+          const average = remoteData.reduce((sum, value) => sum + value, 0) / remoteData.length;
+          
+          if (average > 15) {
+            remoteIndicator.classList.add('active');
+          } else {
+            remoteIndicator.classList.remove('active');
+          }
+          
+          requestAnimationFrame(checkRemoteVolume);
+        }
+        
+        checkRemoteVolume();
+      }
+      
+      // UI Updates
+      function updateStatus(message, type) {
+        status.textContent = message;
+        status.className = '';
+        status.classList.add(`status-${type}`);
+      }
+      
+      function updateRoomUI(isInRoom) {
+        if (isInRoom) {
+          createBtn.disabled = true;
+          joinBtn.disabled = true;
+          leaveBtn.disabled = false;
+          roomInput.disabled = true;
+          connectionInfo.style.display = 'block';
+          currentRoom.textContent = room;
+        } else {
+          createBtn.disabled = false;
+          joinBtn.disabled = false;
+          leaveBtn.disabled = true;
+          roomInput.disabled = false;
+          roomInput.value = '';
+          audioControls.style.display = 'none';
+          connectionInfo.style.display = 'none';
+          status.style.display = 'none';
+        }
+      }
+      
+      // Clean up resources
+      function cleanupPeerConnection() {
+        if (peerConnection) {
+          peerConnection.onicecandidate = null;
+          peerConnection.ontrack = null;
+          peerConnection.oniceconnectionstatechange = null;
+          peerConnection.close();
+          peerConnection = null;
+        }
+        
+        if (localStream) {
+          localStream.getTracks().forEach(track => track.stop());
+        }
+        
+        if (remoteAudio) {
+          remoteAudio.srcObject = null;
+          remoteAudio = null;
+        }
+        
+        isConnected = false;
+        audioControls.style.display = 'none';
+      }
+      
+      function leaveRoom() {
+        if (room) {
+          socket.emit('leave', room);
+          cleanupPeerConnection();
+          room = null;
+          updateRoomUI(false);
+          updateStatus('You left the room', 'warning');
+        }
+      }
+      
+      // Event Listeners
+      createBtn.addEventListener('click', () => {
+        const randomRoom = Math.random().toString(36).substring(2, 8).toUpperCase();
+        socket.emit('create', randomRoom);
+      });
+      
+      joinBtn.addEventListener('click', () => {
+        const roomCode = roomInput.value.trim();
+        if (!roomCode) {
+          updateStatus('Please enter a room code', 'warning');
+          return;
+        }
+        socket.emit('join', roomCode);
+      });
+      
+      leaveBtn.addEventListener('click', leaveRoom);
+      
+      muteBtn.addEventListener('click', () => {
+        if (!localStream) return;
+        
+        isMuted = !isMuted;
+        localStream.getAudioTracks().forEach(track => {
+          track.enabled = !isMuted;
+        });
+        
+        muteBtn.textContent = isMuted ? 'Unmute Microphone' : 'Mute Microphone';
+      });
+      
+      volumeSlider.addEventListener('input', () => {
+        if (remoteAudio) {
+          remoteAudio.volume = volumeSlider.value;
+        }
+      });
+      
+      copyBtn.addEventListener('click', () => {
+        navigator.clipboard.writeText(room)
+          .then(() => {
+            copyBtn.textContent = 'Copied!';
+            setTimeout(() => {
+              copyBtn.textContent = 'Copy';
+            }, 2000);
+          })
+          .catch(err => {
+            console.error('Failed to copy room code:', err);
+          });
+      });
+      
+      // Handle window unload
+      window.addEventListener('beforeunload', () => {
+        if (room) {
+          socket.emit('leave', room);
+        }
+      });
+      
+      // Initialize
+      initializeSocket();
+    });
+  </script>
 </body>
 </html>
